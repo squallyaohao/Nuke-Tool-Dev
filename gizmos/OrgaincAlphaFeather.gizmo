@@ -1,0 +1,172 @@
+#! C:/Program Files/Nuke11.2v3/nuke-11.2.3.dll -nx
+version 11.2 v3
+Gizmo {
+ addUserKnob {20 feathernoise l "Feather Noise"}
+ addUserKnob {6 feather_mod l "feather mod" +STARTLINE}
+ feather_mod true
+ addUserKnob {41 blur_size l "pre-blur size" T Blur1.size}
+ addUserKnob {41 displace_scale l "displace scale" T IDistort1.uv_scale}
+ addUserKnob {20 noise_settings l Noise n 1}
+ addUserKnob {41 opacity T Noise1.opacity}
+ addUserKnob {41 type T Noise1.type}
+ addUserKnob {41 noise_size l "noise size" T Noise1.size}
+ addUserKnob {41 octaves T Noise1.octaves}
+ addUserKnob {41 lacunarity T Noise1.lacunarity}
+ addUserKnob {41 gain T Noise1.gain}
+ addUserKnob {41 gamma T Noise1.gamma}
+ addUserKnob {20 endGroup n -1}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x71c67100
+  label "Copy into forward channel "
+  note_font_size 42
+  xpos 408
+  ypos 928
+  bdwidth 544
+  bdheight 177
+ }
+ StickyNote {
+  inputs 0
+  name StickyNote3
+  label "Pre-Blur Alpha channel"
+  note_font "Verdana Italic Italic Italic"
+  note_font_size 30
+  xpos 514
+  ypos 829
+ }
+ StickyNote {
+  inputs 0
+  name StickyNote1
+  label "u distort pattern"
+  note_font "Verdana Italic Italic Italic"
+  note_font_size 30
+  xpos 231
+  ypos 637
+ }
+ StickyNote {
+  inputs 0
+  name StickyNote2
+  label "v distort pattern"
+  note_font "Verdana Italic Italic Italic"
+  note_font_size 30
+  xpos 763
+  ypos 671
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos 420
+  ypos 571
+ }
+ NoOp {
+  name NoOp1
+  xpos 420
+  ypos 695
+ }
+set N5a2cbc00 [stack 0]
+ Noise {
+  replace true
+  opacity {{Noise1.opacity}}
+  size {{Noise1.size}}
+  zoffset 5
+  octaves {{Noise1.octaves}}
+  lacunarity {{Noise1.lacunarity}}
+  gain {{Noise1.gain}}
+  gamma {{Noise1.gamma}}
+  center {2000 1000}
+  name Noise3
+  xpos 640
+  ypos 695
+ }
+ Dot {
+  name Dot2
+  xpos 674
+  ypos 1083
+ }
+push $N5a2cbc00
+ Noise {
+  replace true
+  size 52
+  gain 0.58
+  gamma 0.77
+  center {2000 1000}
+  name Noise1
+  xpos 200
+  ypos 695
+ }
+ Dot {
+  name Dot1
+  xpos 240
+  ypos 1035
+ }
+set N5a2ca700 [stack 0]
+push $N5a2cbc00
+ Blur {
+  size 200
+  name Blur1
+  xpos 420
+  ypos 833
+ }
+set N5a2ca380 [stack 0]
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 forward.u
+  name Copy1
+  xpos 420
+  ypos 1025
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 forward.v
+  name Copy2
+  xpos 420
+  ypos 1073
+ }
+ IDistort {
+  channels alpha
+  uv forward
+  uv_offset 0.5
+  uv_scale 200
+  blur -rgba.alpha
+  blur_scale 0
+  name IDistort1
+  xpos 420
+  ypos 1289
+ }
+push $N5a2ca380
+ Dot {
+  name Dot4
+  xpos -212
+  ypos 843
+ }
+push $N5a2ca700
+ Dot {
+  name Dot5
+  xpos 240
+  ypos 1339
+ }
+ MergeExpression {
+  inputs 2
+  channel3 alpha
+  expr3 "Aa*Aa + Aa*Ba*(1-Aa)"
+  name MergeExpression1
+  xpos -242
+  ypos 1339
+ }
+ Switch {
+  inputs 2
+  which {{parent.feather_mod}}
+  name Switch1
+  xpos 90
+  ypos 1559
+ }
+ Output {
+  name Output1
+  xpos 90
+  ypos 1654
+ }
+end_group
